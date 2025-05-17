@@ -1,0 +1,61 @@
+.price {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    cursor: pointer;
+}
+
+.page-item.disabled .page-link {
+    cursor: not-allowed;
+}
+
+.product-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.rating {
+    color: #f39c12;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.discount {
+    color: #e74c3c;
+}
+
+.stock-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.status-in-stock {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-low-stock {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-out-stock {
+    background-color: #f8d7da;
+    color: #721c24;
+} 
