@@ -37,20 +37,29 @@ function getStockStatusClass(stock, availabilityStatus) {
 
 // CRUD Operations
 function deleteProduct(productId) {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-    
-    $.ajax({
-        url: `https://dummyjson.com/products/${productId}`,
-        method: 'DELETE',
-        success: function(response) {
-            // Remove product from local array
-            allProducts = allProducts.filter(p => p.id !== productId);
-            displayProducts(currentPage);
-            updatePagination();
-            showAlert('Product deleted successfully', 'success');
-        },
-        error: function() {
-            showAlert('Failed to delete product', 'danger');
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `https://dummyjson.com/products/${productId}`,
+                method: 'DELETE',
+                success: function(response) {
+                    allProducts = allProducts.filter(p => p.id !== productId);
+                    displayProducts(currentPage);
+                    updatePagination();
+                    showAlert('Product deleted successfully', 'success');
+                },
+                error: function() {
+                    showAlert('Failed to delete product', 'error');
+                }
+            });
         }
     });
 }
@@ -70,28 +79,59 @@ function editProduct(productId) {
 }
 
 function updateProduct(productId, data) {
+    Swal.fire({
+        title: 'Updating Product...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     $.ajax({
         url: `https://dummyjson.com/products/${productId}`,
         method: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function(response) {
-            // Update product in local array
             const index = allProducts.findIndex(p => p.id === productId);
             if (index !== -1) {
                 allProducts[index] = { ...allProducts[index], ...response };
             }
             displayProducts(currentPage);
             $('#editProductModal').modal('hide');
-            showAlert('Product updated successfully', 'success');
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Product updated successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
         },
         error: function() {
-            showAlert('Failed to update product', 'danger');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to update product',
+                confirmButtonColor: '#3085d6'
+            });
         }
     });
 }
 
 function addProduct(data) {
+    Swal.fire({
+        title: 'Adding Product...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     $.ajax({
         url: 'https://dummyjson.com/products/add',
         method: 'POST',
@@ -102,25 +142,44 @@ function addProduct(data) {
             displayProducts(1);
             updatePagination();
             $('#addProductModal').modal('hide');
-            showAlert('Product added successfully', 'success');
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Product added successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
         },
         error: function() {
-            showAlert('Failed to add product', 'danger');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to add product',
+                confirmButtonColor: '#3085d6'
+            });
         }
     });
 }
 
 function showAlert(message, type) {
-    const alertHtml = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    $('.alerts-container').append(alertHtml);
-    setTimeout(() => {
-        $('.alert').alert('close');
-    }, 3000);
+    const iconMap = {
+        success: 'success',
+        error: 'error',
+        warning: 'warning',
+        info: 'info'
+    };
+
+    Swal.fire({
+        title: type.charAt(0).toUpperCase() + type.slice(1),
+        text: message,
+        icon: iconMap[type] || 'info',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
 }
 
 function displayProducts(page) {

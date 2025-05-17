@@ -11,14 +11,16 @@ $(document).ready(function() {
         const username = $('#username').val();
         const password = $('#password').val();
         
-        // Show loading state
-        const $submitBtn = $(this).find('button[type="submit"]');
-        const originalBtnText = $submitBtn.text();
-        $submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Logging in...')
-            .prop('disabled', true);
-        
-        // Hide any previous error
-        $('#errorMessage').hide();
+        // Show loading state with SweetAlert2
+        Swal.fire({
+            title: 'Logging in...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
         
         // Make login request
         $.ajax({
@@ -39,8 +41,16 @@ $(document).ready(function() {
                 const expirationTime = new Date().getTime() + (30 * 60 * 1000); // 30 minutes
                 localStorage.setItem('tokenExpiration', expirationTime);
                 
-                // Redirect to products page
-                window.location.href = 'index.html';
+                // Show success message and redirect
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Login successful',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
             },
             error: function(xhr) {
                 let errorMessage = 'Login failed. Please try again.';
@@ -48,14 +58,13 @@ $(document).ready(function() {
                     errorMessage = xhr.responseJSON.message;
                 }
                 
-                // Show error message
-                $('#errorMessage')
-                    .text(errorMessage)
-                    .show();
-                
-                // Reset button
-                $submitBtn.html(originalBtnText)
-                    .prop('disabled', false);
+                // Show error message with SweetAlert2
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: errorMessage,
+                    confirmButtonColor: '#3085d6'
+                });
             }
         });
     });
